@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHP Code Trainer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-badge">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="30,4 56,18 56,42 30,56 4,42 4,18" fill="#1a2744" stroke="#c9a84c" stroke-width="2.5"/>
+        <text x="30" y="35" text-anchor="middle" fill="#c9a84c" font-size="11" font-weight="700" font-family="system-ui">CHP</text>
+      </svg>
+    </div>
+    <h1>Code Trainer</h1>
+    <p class="login-sub">California Highway Patrol · Aural Brevity Codes</p>
+    <div id="login-error" class="error-msg" style="display:none;"></div>
+    <div class="field-group">
+      <label for="login-user">Username</label>
+      <input type="text" id="login-user" autocomplete="username" placeholder="Enter username" />
+    </div>
+    <div class="field-group">
+      <label for="login-pass">Password</label>
+      <input type="password" id="login-pass" autocomplete="current-password" placeholder="Enter password" />
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">Sign in</button>
+    <button class="btn-ghost" onclick="showScreen('setup')">Create account</button>
+  </div>
+</div>
+
+<!-- SETUP (first-time account creation) -->
+<div id="screen-setup" class="screen">
+  <div class="login-wrap">
+    <div class="login-badge">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="30,4 56,18 56,42 30,56 4,42 4,18" fill="#1a2744" stroke="#c9a84c" stroke-width="2.5"/>
+        <text x="30" y="35" text-anchor="middle" fill="#c9a84c" font-size="11" font-weight="700" font-family="system-ui">CHP</text>
+      </svg>
+    </div>
+    <h1>Create Account</h1>
+    <p class="login-sub">Set up your trainer login</p>
+    <div id="setup-error" class="error-msg" style="display:none;"></div>
+    <div class="field-group">
+      <label for="setup-user">Username</label>
+      <input type="text" id="setup-user" placeholder="Choose a username" />
+    </div>
+    <div class="field-group">
+      <label for="setup-pass">Password</label>
+      <input type="password" id="setup-pass" placeholder="Choose a password (min 4 chars)" />
+    </div>
+    <div class="field-group">
+      <label for="setup-pass2">Confirm password</label>
+      <input type="password" id="setup-pass2" placeholder="Repeat password" />
+    </div>
+    <button class="btn-primary" onclick="handleSetup()">Create account</button>
+    <button class="btn-ghost" onclick="showScreen('login')">Back to sign in</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="screen-app" class="screen">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <svg class="header-badge" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="20,2 38,12 38,28 20,38 2,28 2,12" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
+        <text x="20" y="23" text-anchor="middle" fill="#c9a84c" font-size="7" font-weight="700" font-family="system-ui">CHP</text>
+      </svg>
+      <span class="header-title">Code Trainer</span>
+    </div>
+    <div class="header-right">
+      <span class="header-user" id="header-username"></span>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total attempts</div>
+      <div class="stat-value" id="stat-attempts">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Correct</div>
+      <div class="stat-value" id="stat-correct">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Score</div>
+      <div class="stat-value" id="stat-pct">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mastered</div>
+      <div class="stat-value" id="stat-mastered">0</div>
+    </div>
+  </div>
+
+  <!-- Category filter -->
+  <div class="cat-bar" id="cat-bar"></div>
+
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="switchMode('flash')">Flashcards</button>
+    <button class="mode-tab" onclick="switchMode('mc')">Multiple choice</button>
+    <button class="mode-tab" onclick="switchMode('fitb')">Fill in the blank</button>
+    <button class="mode-tab" onclick="switchMode('ref')">Reference</button>
+    <button class="mode-tab" onclick="switchMode('progress')">My progress</button>
+  </div>
+
+  <!-- FLASHCARD MODE -->
+  <div id="mode-flash" class="mode-panel active">
+    <div class="flashcard" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-eyebrow" id="fc-cat"></div>
+          <div class="card-code" id="fc-code"></div>
+          <div class="card-tap">Tap to reveal</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-meaning" id="fc-meaning"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" onclick="prevCard()">&#8592; Prev</button>
+      <span class="card-counter" id="fc-counter"></span>
+      <button class="nav-btn" onclick="nextCard()">Next &#8594;</button>
+    </div>
+    <div class="result-row" id="fc-result-row" style="display:none;">
+      <button class="btn-got-it" onclick="markFlash(true)">✓ Got it</button>
+      <button class="btn-missed" onclick="markFlash(false)">✗ Missed it</button>
+    </div>
+  </div>
+
+  <!-- MULTIPLE CHOICE MODE -->
+  <div id="mode-mc" class="mode-panel">
+    <div class="quiz-question" id="mc-question"></div>
+    <div class="mc-grid" id="mc-options"></div>
+    <div id="mc-feedback" class="feedback" style="display:none;"></div>
+    <button class="btn-next" id="mc-next" onclick="nextMC()" style="display:none;">Next question &#8594;</button>
+  </div>
+
+  <!-- FILL IN BLANK MODE -->
+  <div id="mode-fitb" class="mode-panel">
+    <div class="quiz-question" id="fitb-prompt"></div>
+    <div class="fitb-row">
+      <input type="text" id="fitb-input" class="fitb-input" placeholder="Type the meaning..." onkeydown="if(event.key==='Enter') checkFitb()" />
+      <button class="btn-check" onclick="checkFitb()">Check</button>
+    </div>
+    <div id="fitb-feedback" class="feedback" style="display:none;"></div>
+    <button class="btn-next" id="fitb-next" onclick="nextFitb()" style="display:none;">Next &#8594;</button>
+  </div>
+
+  <!-- REFERENCE MODE -->
+  <div id="mode-ref" class="mode-panel">
+    <div id="ref-content"></div>
+  </div>
+
+  <!-- PROGRESS MODE -->
+  <div id="mode-progress" class="mode-panel">
+    <div class="progress-header">
+      <h2>My Progress</h2>
+      <button class="btn-ghost-sm" onclick="resetProgress()">Reset all progress</button>
+    </div>
+    <div id="progress-content"></div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
