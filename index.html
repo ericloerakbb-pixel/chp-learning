@@ -21,20 +21,21 @@
     <p class="login-sub">California Highway Patrol · Aural Brevity Codes</p>
     <div id="login-error" class="error-msg" style="display:none;"></div>
     <div class="field-group">
-      <label for="login-user">Username</label>
-      <input type="text" id="login-user" autocomplete="username" placeholder="Enter username" />
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" autocomplete="email" placeholder="your@email.com" />
     </div>
     <div class="field-group">
       <label for="login-pass">Password</label>
-      <input type="password" id="login-pass" autocomplete="current-password" placeholder="Enter password" />
+      <input type="password" id="login-pass" autocomplete="current-password" placeholder="Password" />
     </div>
     <button class="btn-primary" onclick="handleLogin()">Sign in</button>
-    <button class="btn-ghost" onclick="showScreen('setup')">Create account</button>
+    <button class="btn-ghost" onclick="showScreen('signup')">Create account</button>
+    <button class="btn-link" onclick="handleForgotPassword()">Forgot password?</button>
   </div>
 </div>
 
-<!-- SETUP (first-time account creation) -->
-<div id="screen-setup" class="screen">
+<!-- SIGN UP SCREEN -->
+<div id="screen-signup" class="screen">
   <div class="login-wrap">
     <div class="login-badge">
       <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,29 +44,40 @@
       </svg>
     </div>
     <h1>Create Account</h1>
-    <p class="login-sub">Set up your trainer login</p>
-    <div id="setup-error" class="error-msg" style="display:none;"></div>
+    <p class="login-sub">Sign up to track your progress</p>
+    <div id="signup-error" class="error-msg" style="display:none;"></div>
+    <div id="signup-success" class="success-msg" style="display:none;"></div>
     <div class="field-group">
-      <label for="setup-user">Username</label>
-      <input type="text" id="setup-user" placeholder="Choose a username" />
+      <label for="signup-name">Display name</label>
+      <input type="text" id="signup-name" placeholder="e.g. Officer Smith" />
     </div>
     <div class="field-group">
-      <label for="setup-pass">Password</label>
-      <input type="password" id="setup-pass" placeholder="Choose a password (min 4 chars)" />
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" placeholder="your@email.com" />
     </div>
     <div class="field-group">
-      <label for="setup-pass2">Confirm password</label>
-      <input type="password" id="setup-pass2" placeholder="Repeat password" />
+      <label for="signup-pass">Password</label>
+      <input type="password" id="signup-pass" placeholder="At least 6 characters" />
     </div>
-    <button class="btn-primary" onclick="handleSetup()">Create account</button>
+    <button class="btn-primary" onclick="handleSignup()">Create account</button>
     <button class="btn-ghost" onclick="showScreen('login')">Back to sign in</button>
+  </div>
+</div>
+
+<!-- LOADING SCREEN -->
+<div id="screen-loading" class="screen">
+  <div class="loading-wrap">
+    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:64px;">
+      <polygon points="30,4 56,18 56,42 30,56 4,42 4,18" fill="#1a2744" stroke="#c9a84c" stroke-width="2.5"/>
+      <text x="30" y="35" text-anchor="middle" fill="#c9a84c" font-size="11" font-weight="700" font-family="system-ui">CHP</text>
+    </svg>
+    <p>Loading...</p>
   </div>
 </div>
 
 <!-- MAIN APP -->
 <div id="screen-app" class="screen">
 
-  <!-- Header -->
   <header class="app-header">
     <div class="header-left">
       <svg class="header-badge" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -80,10 +92,9 @@
     </div>
   </header>
 
-  <!-- Stats bar -->
   <div class="stats-bar">
     <div class="stat-card">
-      <div class="stat-label">Total attempts</div>
+      <div class="stat-label">Attempts</div>
       <div class="stat-value" id="stat-attempts">0</div>
     </div>
     <div class="stat-card">
@@ -100,10 +111,8 @@
     </div>
   </div>
 
-  <!-- Category filter -->
   <div class="cat-bar" id="cat-bar"></div>
 
-  <!-- Mode tabs -->
   <div class="mode-tabs">
     <button class="mode-tab active" onclick="switchMode('flash')">Flashcards</button>
     <button class="mode-tab" onclick="switchMode('mc')">Multiple choice</button>
@@ -112,7 +121,7 @@
     <button class="mode-tab" onclick="switchMode('progress')">My progress</button>
   </div>
 
-  <!-- FLASHCARD MODE -->
+  <!-- FLASHCARD -->
   <div id="mode-flash" class="mode-panel active">
     <div class="flashcard" onclick="flipCard()">
       <div class="card-inner" id="card-inner">
@@ -137,7 +146,7 @@
     </div>
   </div>
 
-  <!-- MULTIPLE CHOICE MODE -->
+  <!-- MULTIPLE CHOICE -->
   <div id="mode-mc" class="mode-panel">
     <div class="quiz-question" id="mc-question"></div>
     <div class="mc-grid" id="mc-options"></div>
@@ -145,7 +154,7 @@
     <button class="btn-next" id="mc-next" onclick="nextMC()" style="display:none;">Next question &#8594;</button>
   </div>
 
-  <!-- FILL IN BLANK MODE -->
+  <!-- FILL IN BLANK -->
   <div id="mode-fitb" class="mode-panel">
     <div class="quiz-question" id="fitb-prompt"></div>
     <div class="fitb-row">
@@ -156,22 +165,23 @@
     <button class="btn-next" id="fitb-next" onclick="nextFitb()" style="display:none;">Next &#8594;</button>
   </div>
 
-  <!-- REFERENCE MODE -->
+  <!-- REFERENCE -->
   <div id="mode-ref" class="mode-panel">
     <div id="ref-content"></div>
   </div>
 
-  <!-- PROGRESS MODE -->
+  <!-- PROGRESS -->
   <div id="mode-progress" class="mode-panel">
     <div class="progress-header">
       <h2>My Progress</h2>
-      <button class="btn-ghost-sm" onclick="resetProgress()">Reset all progress</button>
+      <button class="btn-ghost-sm" onclick="resetProgress()">Reset progress</button>
     </div>
     <div id="progress-content"></div>
   </div>
 
 </div>
 
-<script src="app.js"></script>
+<!-- Firebase SDKs -->
+<script type="module" src="app.js"></script>
 </body>
 </html>
